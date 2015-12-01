@@ -100,7 +100,8 @@ class CAS_Maestro {
  		//Get blog settings. If they doesn't exist, get the network settings.
  		$this->settings = get_option('wpCAS_settings',$this->network_settings);
  		$this->phpcas_path = get_option('wpCAS_phpCAS_path',CAS_MAESTRO_PLUGIN_PATH.'phpCAS/CAS.php');
- 		$this->allowed_users = get_option('wpCAS_allowed_users',array());	
+ 		//$this->allowed_users = get_option('wpCAS_allowed_users',array());	
+ 		$this->allowed_users = array_change_key_case(get_option('wpCAS_allowed_users',array()),CASE_LOWER);
  		$this->change_users_capability = 'edit_posts';
 
  		if(!isset($_SESSION))
@@ -690,7 +691,7 @@ class CAS_Maestro {
 			foreach($_POST['username'] as $i => $username) {
 				if($username=='')
 					continue;
-				$allowed_users[$username] = $_POST['role'][$i];
+				$allowed_users[strtolower($username)] = $_POST['role'][$i];
 			}
 
 
@@ -718,8 +719,8 @@ class CAS_Maestro {
 	 *   or true if the global registration is enabled, false otherwise.
 	 */
 	function canUserRegister($username) {
-		if(isset($this->allowed_users[$username]))
-			return $this->allowed_users[$username];
+		if(isset($this->allowed_users[strtolower($username)]))
+			return $this->allowed_users[strtolower($username)];
 
 		if($this->settings['new_user'])
 			return true; //User global registration is enabled
